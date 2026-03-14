@@ -2,6 +2,7 @@ import os
 import requests
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
+from flask_cors import CORS
 load_dotenv()
 
 UNSPLASH_URL = "https://api.unsplash.com/search/photos"
@@ -13,6 +14,7 @@ if not UNSPLASH_KEY:
     raise EnvironmentError("UNSPLASH_KEY is missing in .env")
 
 app = Flask(__name__)
+CORS(app)
 app.config["DEBUG"] = DEBUG
 
 
