@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node
 node_modules
 dist
 dist-ssr
@@ -16,9 +17,29 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Python virtual environments
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.py[cod]
+
+# Flask
+instance/
+.flaskenv
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store

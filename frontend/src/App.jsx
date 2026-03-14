@@ -1,48 +1,86 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [search, setSearch] = useState("")
-  const [images, setImages] = useState([])
-  const ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS;
+  const [search, setSearch] = useState("");
+  const [images, setImages] = useState([]);
+  const [open, setOpen] = useState(null);
+  const ref = useRef(null);
+  const KEY = import.meta.env.VITE_UNSPLASH_ACCESS;
+  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5050'
+
+  console.log(API_URL, 'API_URL')
+
+  useEffect(() => {
+    const close = e => ref.current && !ref.current.contains(e.target) && setOpen(null);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  const handleSubmit = async () => {
+    const r = await fetch(`${API_URL}/get_images?query=${search}`);
+    const d = await r.json();
+    setImages(d.results || []);
+  };
+
+  const handleDownload = async (url, name) => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = name + ".jpg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      window.URL.revokeObjectURL(blobUrl);
+      setOpen(null);
+    } catch (err) {
+      console.log("Download failed:", err);
+    }
+  };
 
 
-  const handleSubmit = () => {
-    console.log(search, 'search')
-    fetch(`https://api.unsplash.com/search/photos?query=${search}&per_page=10&client_id=${ACCESS_KEY}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setImages(data?.results)
-      })
-      .catch((err) => console.log(err))
-  }
-  console.log(images, 'images')
   return (
     <>
-      <div>
-        <input type="search" placeholder="Enter your name" value={search} onChange={(e) => setSearch(e.target.value)} />
-        <button onClick={() => handleSubmit()}>search</button>
+      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+        <input type="search" placeholder="Enter your name" value={search} onChange={(e) => setSearch(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: 'none', width: '300px' }} />
+        <button onClick={() => handleSubmit()}>Search</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px", marginTop: "20px", }}>
         {images.map((list, idx) => (
-          <img
-            key={idx}
-            src={list.urls.small}
-            alt={list.alt_description}
-            style={{
-              width: "100%",
-              height: "25rem",
-              objectFit: "cover",
-              borderRadius: "10px",
-              transition: "transform 0.3s ease",
-              cursor: "pointer",
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          />
+          <div key={idx + 1} style={{ position: "relative", overflow: "hidden", borderRadius: "10px", }}>
+            <img src={list.urls.small} alt={list.alt_description}
+              style={{ width: "100%", height: "25rem", objectFit: "cover", transition: "transform 0.3s ease", cursor: "pointer", }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.transform = "scale(1.05)")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
+            />
+
+            {/* 🔽 Bottom Text */}
+            <div ref={open === list.id ? ref : null} style={{ display: 'flex', cursor: 'pointer', justifyContent: 'space-around', position: "absolute", bottom: "10px", left: "10px", right: "10px", color: "#fff", background: "rgba(0, 0, 0, 0.4)", padding: "5px 10px", borderRadius: "6px", fontSize: "14px", }} onClick={() => setOpen(open === list.id ? null : list.id)} >
+              <p style={{ padding: '0px', margin: '0px' }}>{list.width} X {list.height}</p>
+              <span>
+                ⋮
+              </span>
+              <div style={{ textAlign: 'left', position: 'absolute', display: open === list.id ? 'flex' : 'none', flexDirection: 'column', bottom: '1px', right: '10px', background: '#fff', color: '#000', padding: '10px', borderRadius: '5px' }}>
+                {Object.keys(list.urls).map((dimg, idx) => {
+                  { console.log(list.urls[dimg], list.slug, '000') }
+                  return <span key={idx} onClick={() => handleDownload(list.urls[dimg], list.slug)} style={{ cursor: 'pointer', margin: '3px 0' }}>{dimg}</span>
+                })}
+              </div>
+            </div>
+          </div>
         ))}
       </div>
+
     </>
   )
 }
