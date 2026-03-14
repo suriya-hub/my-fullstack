@@ -9,7 +9,6 @@ function App() {
   const KEY = import.meta.env.VITE_UNSPLASH_ACCESS;
   const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5050'
 
-  console.log(API_URL, 'API_URL')
 
   useEffect(() => {
     const close = e => ref.current && !ref.current.contains(e.target) && setOpen(null);
@@ -64,7 +63,6 @@ function App() {
               }
             />
 
-            {/* 🔽 Bottom Text */}
             <div ref={open === list.id ? ref : null} style={{ display: 'flex', cursor: 'pointer', justifyContent: 'space-around', position: "absolute", bottom: "10px", left: "10px", right: "10px", color: "#fff", background: "rgba(0, 0, 0, 0.4)", padding: "5px 10px", borderRadius: "6px", fontSize: "14px", }} onClick={() => setOpen(open === list.id ? null : list.id)} >
               <p style={{ padding: '0px', margin: '0px' }}>{list.width} X {list.height}</p>
               <span>

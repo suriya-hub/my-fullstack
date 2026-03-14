@@ -3,6 +3,7 @@ import requests
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
+
 load_dotenv()
 
 UNSPLASH_URL = "https://api.unsplash.com/search/photos"
@@ -28,11 +29,8 @@ def get_images():
     search = request.args.get("query")
     if not search:
         return jsonify({"error": "Query parameter is required"}), 400
-    headers = {
-        "Authorization": f"Client-ID {UNSPLASH_KEY}",
-        "Accept-Version": "v1"
-    }
-    params = {"query": search, "per_page": 10}
+    headers = {"Authorization": f"Client-ID {UNSPLASH_KEY}", "Accept-Version": "v1"}
+    params = {"query": search, "per_page": 5}
     try:
         response = requests.get(UNSPLASH_URL, headers=headers, params=params)
         response.raise_for_status()
