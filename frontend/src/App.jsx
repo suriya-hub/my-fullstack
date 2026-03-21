@@ -46,7 +46,7 @@ function App() {
   return (
     <>
       <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <input type="search" placeholder="Enter your name" value={search} onChange={(e) => setSearch(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: 'none', width: '300px' }} />
+        <input type="search" placeholder="Search.." value={search} onChange={(e) => setSearch(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: 'none', width: '300px' }} />
         <button onClick={() => handleSubmit()}>Search</button>
       </div>
 
