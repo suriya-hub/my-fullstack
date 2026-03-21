@@ -3,6 +3,7 @@ import requests
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
+from mongo_client import test_doc
 
 load_dotenv()
 
@@ -18,6 +19,8 @@ app = Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = DEBUG
 
+
+test_doc()
 
 @app.route("/")
 def home():
