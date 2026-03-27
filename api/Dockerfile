@@ -1,17 +1,15 @@
-FROM python:3.14
+FROM python:3.11
+
 WORKDIR /app
 
-# 1. Install pipenv
-RUN pip install pipenv
+RUN pip install --no-cache-dir pipenv
 
-# 2. Copy dependency files
 COPY Pipfile Pipfile.lock ./
 
-# 3. Install dependencies from Pipfile into the system python
-RUN pipenv install --system --deploy
+# 🔥 IMPORTANT FIX
+RUN pipenv install --system --ignore-pipfile
 
-# 4. Copy the rest of the code
-COPY . ./
+COPY . .
 
 EXPOSE 5050
 

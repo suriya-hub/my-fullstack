@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import axios from "axios";
 
 function App() {
   const [search, setSearch] = useState("");
@@ -16,10 +17,28 @@ function App() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
+  useEffect(() => {
+    fetchImages()
+  }, [])
+
+  const fetchImages = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/images`);
+      console.log(response);
+      setImages(response?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSubmit = async () => {
-    const r = await fetch(`${API_URL}/get_images?query=${search}`);
-    const d = await r.json();
-    setImages(d.results || []);
+    try {
+      const response = await axios.get(`${API_URL}/get_images?query=${search}`);
+      console.log(response);
+      setImages(response?.data.results || []);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleDownload = async (url, name) => {
