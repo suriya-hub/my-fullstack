@@ -16,8 +16,9 @@ mongo_client = MongoClient(
     port=MONGO_PORT,
 )
 
+
 def test_doc():
     db = mongo_client.test
     test_collection = db.test_collection
-    res = test_collection.insert_one({"name":"suriya","developer":True})
+    res = test_collection.insert_one({"name": "suriya", "developer": True})
     print(res)

@@ -17,15 +17,27 @@ if not UNSPLASH_KEY:
     raise EnvironmentError("UNSPLASH_KEY is missing in .env")
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    resources={r"/*": {"origins": "*"}},
+    methods=["GET", "POST", "DELETE"],
+    allow_headers=["Content-Type"],
+)
 app.config["DEBUG"] = DEBUG
 
 
-test_doc()
+@app.after_request
+def after_request(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE, OPTIONS"
+    return response
+
 
 @app.route("/")
 def home():
     return "API Running"
+
 
 @app.route("/get_images")
 def get_images():
@@ -64,6 +76,19 @@ def images():
             if "duplicate key error" in str(e):
                 return jsonify({"error": "Image already exists"}), 400
             return jsonify({"error": str(e)}), 500
+
+
+@app.route("/images/<image_id>", methods=["DELETE", "OPTIONS"])
+def delete_image(image_id):
+    if request.method == "OPTIONS":
+        return "", 200
+    try:
+        result = images_collection.delete_one({"_id": image_id})
+        if result.deleted_count == 0:
+            return jsonify({"error": "Image not found"}), 404
+        return jsonify({"message": "Deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
